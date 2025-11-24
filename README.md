@@ -25,6 +25,8 @@ py a.py
 
 A primeira janela que irá mostar será o diagrama de Bode do filtro ultilizado. Ao fechar tal janela, você terá livre acesso ao afinador propriamente dito.
 
+![Exemplo de uso](.\exemplo.gif)
+
 ## Como funciona
 
 O som é captado via o microfone do dispositivo ultilizado e posteriormente filtrado por meio de um **filtro Butterworth passa-banda digital**, que captura frequências de 100 Hz à 700 Hz, menor e maior frequências produzidas nas cordas de um violino respectivamente.
