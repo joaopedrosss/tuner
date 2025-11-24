@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pyaudio
 import numpy as np
 from time import sleep
-from scipy.signal import butter, lfilter
+from scipy.signal import butter, lfilter, TransferFunction, bode, freqz
 from scipy.io import wavfile
 import threading
 
@@ -16,10 +16,6 @@ def mostrar_grafico_frequencias_captadas():
     plt.tight_layout()        
     plt.show()
 
-def mostrar_grafico_espectro_captado():
-    ani = FuncAnimation(plt.gcf(), grafico_espectro_captado, interval=500)
-    plt.tight_layout()        
-    plt.show()
 
 # Graficos com as frequencias captadas
 
@@ -40,23 +36,33 @@ def grafico_frequencias_captadas(i):
     for i,j in zip(valoresEixoX,frequencia_com_fitro_buffer):
          plt.text(i, j, str(round(j)), ha='center', va='bottom')
 
-  
-
-def grafico_espectro_captado(i):
-    plt.cla()
-    plt.plot(fft_frequencias,fft_coeficientes,color="blue",label="Frequencias captadas")
-    plt.legend()
-    plt.title("Espectro das Frequências")
-    plt.xlabel("Frequencia")
-    plt.ylabel("Magnitude")
-
-    #for x,y in zip(fft_frequencias,fft_coeficientes):
-    #    plt.text(x,y,str(round(x,2)),ha='center', va='bottom')
-
-
+# Mostrar diagrama de Bode do Filtro
 
 def grafico_filtro():
-    pass
+    filtro_nun, filtro_den = butter_FT(lowcut=frequencia_minima, highcut=frequencia_maxima, fs=RATE, order=4)
+
+    w, h = freqz(filtro_nun, filtro_den, worN = 8000)
+
+    freq = (w/np.pi)*(RATE/2)
+
+    plt.figure(figsize=(10, 6))
+    plt.subplot(2,1,1)
+    plt.semilogx(freq, abs(h))
+    plt.title('Diagrama de Bode - Magnitude')
+    plt.xlabel('Frequência (Hz)')
+    plt.ylabel('Magnitude')
+    plt.grid(True)
+
+    # Diagrama de fase
+    plt.subplot(2,1,2)
+    plt.semilogx(freq, np.unwrap(np.angle(h)) * 180 / np.pi)
+    plt.title('Diagrama de Bode - Fase')
+    plt.xlabel('Frequência (Hz)')
+    plt.ylabel('Fase (graus)')
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
 
 
 # Criar função de transferência para o nosso filtro
@@ -206,6 +212,11 @@ def captar_frequencias_do_micro():
     root.update()
     root.after(10,captar_frequencias_do_micro())
 
+# Filtro - Função de Transferência
+
+global filtro_num
+global filtro_den
+
 # Espectro das Frequencias
 
 fft_coeficientes = []
@@ -240,8 +251,7 @@ frames = []
 
 inserir_notas()
 
-micro = 0
-
+grafico_filtro()
 
 # Iniciar o pyaudio e abrir microfone
 
@@ -270,12 +280,12 @@ la_show.pack(pady=20)
 mi_show = tk.Label(root, font=("calibri",15),fg="black")
 mi_show.pack(pady=20)
 
+
+#thread_2 = threading.Thread(target=grafico_filtro)
+#thread_2.start()
+
 thread_1 = threading.Thread(target=mostrar_grafico_frequencias_captadas)
 thread_1.start()
-
-thread_2 = threading.Thread(target=mostrar_grafico_espectro_captado)
-thread_2.start()
-
 
 root.after(10,captar_frequencias_do_micro())
 root.mainloop()
