@@ -25,7 +25,7 @@ py a.py
 
 A primeira janela que irá mostar será o diagrama de Bode do filtro ultilizado. Ao fechar tal janela, você terá livre acesso ao afinador propriamente dito.
 
-![Exemplo de uso](.\exemplo.gif)
+![Exemplo de uso](exemplo.gif)
 
 ## Como funciona
 
